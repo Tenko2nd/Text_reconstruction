@@ -50,15 +50,13 @@ def load_data_from_directory(data_dir: str, batch_size: int = 32):
     return dataset
 
 if __name__ == '__main__':
-    data_dir = "images"  # Remplacez par le chemin vers votre dossier "images"
-    
-    # Charger les données
-    dataset = load_data_from_directory(data_dir)
+    train_data_dir = "images"  # Remplacez par le chemin vers votre dossier "images"
+    val_data_dir = "test"
+    BATCH_SIZE = 32
 
-    # Séparer en train et validation (80% train, 20% validation)
-    val_size = int(0.2 * len(dataset))
-    train_dataset = dataset.skip(val_size)
-    val_dataset = dataset.take(val_size)
+    # Charger les données
+    train_dataset = load_data_from_directory(train_data_dir, batch_size=BATCH_SIZE)
+    val_dataset = load_data_from_directory(val_data_dir, batch_size=BATCH_SIZE)
 
     # Initialiser le modèle
     model = CustomModel()
@@ -66,10 +64,22 @@ if __name__ == '__main__':
     # Compiler le modèle
     model.compile(optimizer='adam',
                   loss='sparse_categorical_crossentropy',  # Utilisez 'sparse_categorical_crossentropy' pour des labels entiers
-                  metrics=['accuracy'])
+                  metrics=['accuracy']),
+                  
 
     # Entraîner le modèle
-    model.fit(train_dataset, epochs=10, validation_data=val_dataset)
+    model.fit(train_dataset, 
+            epochs=10, 
+            validation_data=val_dataset,
+            workers=4,
+            use_multiprocessing=True)
 
     # Résumé du modèle
     model.summary()
+
+
+    # Évaluation finale sur l'ensemble de validation ('test' dans votre cas)
+    print("\nÉvaluation finale sur l'ensemble de validation ('test')...")
+    loss, accuracy = model.evaluate(val_dataset)
+    print(f"Perte (Loss) sur la validation : {loss:.4f}")
+    print(f"Précision (Accuracy) sur la validation : {accuracy:.4f}")
