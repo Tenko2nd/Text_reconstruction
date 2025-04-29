@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from tqdm import tqdm  # Importation de tqdm pour la barre de chargement
 
 def csv_to_image(row, image_size=28):
     """
@@ -30,7 +31,7 @@ def save_image(image, label, image_size=28):
     label_ascii = ord(str(label))  # Utiliser ord() pour obtenir le code ASCII du label
     
     # Créer un dossier pour le code ASCII du label si ce n'est pas déjà fait
-    label_dir = f'images/{label_ascii}'
+    label_dir = f'caracteres/{label_ascii}'
     os.makedirs(label_dir, exist_ok=True)
     
     # Trouver le prochain index pour l'image (le nombre d'images déjà présentes dans le dossier)
@@ -40,7 +41,6 @@ def save_image(image, label, image_size=28):
     # Sauvegarder l'image
     filename = f'{label_dir}/{label_ascii}_{next_index}.png'
     plt.imsave(filename, image, cmap='gray')
-    print(f"Image sauvegardée sous : {filename}")
 
 # Chargement des données à partir du CSV
 try:
@@ -52,8 +52,8 @@ except FileNotFoundError:
 # Remplacer les valeurs manquantes par 0
 df.fillna(0, inplace=True)
 
-# Parcourir les lignes du DataFrame et sauvegarder les images
-for i in range(len(df)):
+# Utilisation de tqdm pour la barre de chargement
+for i in tqdm(range(len(df)), desc="Processing images", ncols=100, leave=True):
     row = df.iloc[i]  # Accède à la i-ème ligne du DataFrame
     image = csv_to_image(row)
     label = row['labels']  # Récupère l'étiquette de la colonne 'labels'
