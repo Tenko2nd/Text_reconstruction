@@ -7,9 +7,9 @@ from glob import glob
 input_folder = "cropped_images"
 output_folder = "lettres_sep_mix_2"
 resize_width = 600
-morph_open_kernel = (3, 3)
-morph_close_kernel = (3, 3)
-min_contour_area = 30
+morph_open_kernel = (3, 2) # 3,3
+morph_close_kernel = (1, 1)
+min_contour_area = 200
 min_letter_size = (5, 10)
 letter_margin = 3
 output_size = 28
